@@ -238,13 +238,15 @@ static bool DoMPQSearch_FileEntry(
 
             // Prepare the block index
             dwBlockIndex = (DWORD)(pFileEntry - ha->pFileTable);
+            if(dwBlockIndex == 569)
+                szNameBuff[0] = 'F';
 
             // Get the file name. If it's not known, we will create pseudo-name
             szFileName = pFileEntry->szFileName;
             if(szFileName == NULL)
             {
                 // Open the file by its pseudo-name.
-                sprintf(szNameBuff, "File%08u.xxx", (unsigned int)dwBlockIndex);
+                StringCreatePseudoFileName(szNameBuff, _countof(szNameBuff), dwBlockIndex, "xxx");
                 if(SFileOpenFileEx((HANDLE)hs->ha, szNameBuff, SFILE_OPEN_BASE_FILE, &hFile))
                 {
                     SFileGetFileName(hFile, szNameBuff);
@@ -343,7 +345,7 @@ static int DoMPQSearch(TMPQSearch * hs, SFILE_FIND_DATA * lpFindFileData)
 
     // Start searching with base MPQ
     while(ha != NULL)
-    { 
+    {
         // If the archive has hash table, we need to use hash table
         // in order to catch hash table index and file locale.
         // Note: If multiple hash table entries, point to the same block entry,
@@ -443,7 +445,7 @@ HANDLE WINAPI SFileFindFirstFile(HANDLE hMpq, const char * szMask, SFILE_FIND_DA
         FreeMPQSearch(hs);
         SetLastError(nError);
     }
-    
+
     // Return the result value
     return (HANDLE)hs;
 }
